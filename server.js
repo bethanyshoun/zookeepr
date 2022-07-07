@@ -7,6 +7,8 @@ const PORT = process.env.PORT || 3001;
 
 const app = express();
 
+//sets up Express.js middleware to instruct server to make files readily available- not gated behind a server endpoint
+app.use(express.static('public'));
 //parse incoming string or array data
 app.use(express.urlencoded({ extended: true }));
 //partse incoming JSON data
@@ -123,7 +125,27 @@ app.post('/api/animals', (req, res) => {
   }
 });
 
-//add listen event
+//route to get index.html to be served from Expre;ss.js server
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+// route to animals.html (routes ending in /<word> can be assumed to serve HTML pages while those with "api" will transfer JSON data)
+app.get('/animals', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/animals.html'));
+});
+
+//route to zookeeper html page
+app.get('/zookeepers', (req, res) => {
+  res.sendFile(path.join(__dirname, './public/zookeepers.html'));
+});
+
+//wildcard route for nonexistent requests to direct back to the homepage ~routes with '*' should always come last or they will override routes above and they will seem not to work~
+app.get('*', (requ, res) => {
+  res.sendFile(path.join(__dirname, './public/index.html'));
+});
+
+//add listen event- listen events should always go last
 app.listen(PORT, () => {
     console.log(`API server now on port ${PORT}!`);
 });
